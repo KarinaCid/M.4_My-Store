@@ -1,8 +1,13 @@
 import { expect } from 'chai'
-import { shallowMount } from '@vue/test-utils'
-import sinon from 'sinon'
+import { shallowMount, createLocalVue } from '@vue/test-utils'
+import dummyStore from './mocks/store'
+import vuex from 'vuex'
 
 import Products from '@/components/Products.vue'
+
+const localVue = createLocalVue()
+localVue.use(vuex)
+const store = new vuex.Store(dummyStore)
 
 describe('Products.vue', () => {
   it('Muestra el titulo "Nuestros Productos"', () => {
@@ -33,19 +38,36 @@ describe('Products.vue', () => {
     searchBox.setValue(productSearch)
     expect(wrapper.text()).to.not.include(productName)
   }),
-  it('Añade los productos al carro', () => {
+  it ('Encuentra los productos', () => {
+    const productName = 'Computadora'
     const wrapper = shallowMount(Products, {})
-    const clickMethodStub = sinon.stub()
+    const searchBox = wrapper.find('input')
+    wrapper.vm.products = [{
+      name: 'Computadora',
+      price: 100.0,
+      qty: 1, 
+    },
+    {
+      name: 'Teclado',
+      price: 100.0,
+      qty: 1, 
+    }]
+    searchBox.setValue(productName)
+    expect(wrapper.text()).to.include(productName)
+    expect(wrapper.text()).to.not.include('Teclado')
+  }),
+  it('Añade los productos al carro', () => {
+
+    const wrapper = shallowMount(Products, {store, localVue})
+
     wrapper.vm.products = [{
       name: 'Computadora',
       price: 100.0,
       qty: 1,
     }]
-    wrapper.setMethods({
-      addToCart: clickMethodStub
-    })
+
     const addButton = wrapper.find('.card .button')
     addButton.trigger('click')
-    expect(clickMethodStub.called).to.equal(true)
+    expect(store.state.shoppingCart.total).to.equal(100)
   })
 })

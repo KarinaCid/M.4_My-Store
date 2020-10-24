@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { mount, createLocalVue } from '@vue/test-utils'
+import { shallowMount, createLocalVue } from '@vue/test-utils'
 
 import Navbar from '@/components/Navbar.vue'
 import Vuex from "vuex"
@@ -19,7 +19,7 @@ const router = new VueRouter(myRoutes)
 describe('Navbar.vue', () => {
   it('muestra menu de login si no hay usuario', () => {
     store.dispatch('updateUser', undefined)
-    const wrapper = mount(Navbar, {
+    const wrapper = shallowMount(Navbar, {
       propsData: {
         title: "Mi Tienda"
       },
@@ -31,7 +31,7 @@ describe('Navbar.vue', () => {
   }),
   it('muestra menu de usuario si está logueado', () => {
     store.dispatch('updateUser', { email: 'user@mystore.com' })
-    const wrapper = mount(Navbar, {
+    const wrapper = shallowMount(Navbar, {
       propsData: {
         title: "Mi Tienda"
       },
